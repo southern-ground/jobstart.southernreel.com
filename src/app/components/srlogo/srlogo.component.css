@@ -1,0 +1,10 @@
+:host svg{
+    width: 100px;
+    height: auto;
+    margin: 0 10px 0 0;
+    position: relative;
+    top: 3px;
+}
+:host.light >>> svg {
+    fill: white;
+}

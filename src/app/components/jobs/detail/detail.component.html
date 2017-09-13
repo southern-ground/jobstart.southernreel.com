@@ -1,0 +1,15 @@
+<h1>Job Start Details</h1>
+<div class="job">
+    <div class="card">
+        <div class="card-header">
+            {{job?job.name:'Loading'}}
+        </div>
+        <div class="card-block">
+            <div class="card-text">
+                <p><label>ID: </label> {{job?job.id:''}}</p>
+                <p><label>GUID: </label> {{job?job.guid:''}}</p>
+                <p><label>Date Created: </label> {{job?job.date_created:''}}</p>
+            </div>
+        </div>
+    </div>
+</div>

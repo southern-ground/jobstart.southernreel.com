@@ -1,0 +1,7 @@
+<script src="app-jobs.component.ts"></script>
+
+<div class="container">
+    <h1>Jobs</h1>
+    <p>This is the list of all jobs currently in the system.</p>
+    <app-job *ngFor="let job of jobs" [job]="job"></app-job>
+</div>

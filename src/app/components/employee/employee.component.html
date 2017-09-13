@@ -1,0 +1,15 @@
+<div class="employee">
+  <div class="card">
+    <div class="card-header">
+      {{employee.first_name}} {{employee.nickname !== "" ? employee.nickname : ""}} {{employee.last_name}}<a href="employees" class="btn btn-link" (click)="this.toggleHide($event)">{{employee.hide !==true?"More" : "Less"}}</a>
+    </div>
+    <div class="card-block" [hidden]="employee.hide!==true">
+      <div class="card-text">
+        <p><label>Email: </label> <a href="mailto:{{employee.email}}">{{employee.email}}</a></p>
+        <p><label>Phone: </label> <a href="tel:{{employee.phone}}">{{employee.phone}}</a></p>
+        <p><label>Office Phone: </label> <a href="tel:{{employee.phone}}">{{employee.phone}}</a></p>
+        <p><label>Phone: </label> <a href="tel:{{employee.office_phone}}">{{employee.office_phone}}</a></p>
+      </div>
+    </div>
+  </div>
+</div>
