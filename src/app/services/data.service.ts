@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Job} from '../models/Job';
 import {Employee} from '../models/Employee';
-import {Http} from '@angular/http';
+import {Headers, Http} from '@angular/http';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -16,8 +16,27 @@ export class DataService {
         this.urlPrefix = this.isLocal ? 'http://localhost:8888' : '';
     }
 
+    addEmployee(emp: object) {
+        let url = this.urlPrefix + '/api/employee/add/';
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this.http
+            .put(url, JSON.stringify(emp), headers)
+            .map(res => res.json());
+    }
+
+    getEmployee(id: string) {
+        return this.http.get(this.urlPrefix + '/api/employee/' + id)
+            .map(res => res.json());
+    }
+
     getEmployees() {
         return this.http.get(this.urlPrefix + '/api/employees')
+            .map(res => res.json());
+    }
+
+    getDepartments() {
+        return this.http.get(this.urlPrefix + '/api/departments')
             .map(res => res.json());
     }
 
