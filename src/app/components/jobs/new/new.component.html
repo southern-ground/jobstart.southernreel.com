@@ -1,25 +1,219 @@
+<div class="blocker" [hidden]="hasLoaded">
+    <p>Loading ...</p>
+</div>
+
 <h1>
     New Job Start
 </h1>
+
 <p>
     This is the page where the workflow for creating a new job will begin.
 </p>
 
-<form>
-    <div class="form-group">
-        <label for="creatorName">Your Name</label>
-        <input type="text" class="form-control" id="creatorName" required placeholder="Your Name">
+<form [formGroup]="newJobForm" (ngSubmit)="onSubmitJobForm(newJobForm.value)">
+    <div class="form-group row">
+        <label class="col-md-2 col-sm-12 col-form-label" for="creator_name">Your Name</label>
+        <div class="col-md-10 col-sm-12">
+            <input id="creator_name"
+                   name="creator_name"
+                   class="validate filter-input form-control"
+                   placeholder="Your Name"
+                   [formControl]="newJobForm.controls['creator_name']"
+                   type="text"
+                   [required]
+                   (keyup)=filterEmployees()>
+            <div class="suggestions">
+                <ul class="suggestions__list"
+                    *ngIf="filteredEmployeeList.length > 0">
+                    <li *ngFor="let creator of filteredEmployeeList">
+                        <a (click)="onSelectCreator(creator)">{{creator.name}}</a>
+                    </li>
+                </ul>
+                <div class="unknown" [hidden]="!hasTyped">
+                    <p>Name not appearing? Click <a class="btn-link"
+                                                    data-toggle="modal"
+                                                    data-target="#addCreatorModal"
+                                                    (click)="showUserModal()">here</a>.</p>
+                </div>
+            </div>
+
+            <div *ngIf="newJobForm.controls['creator_name'].hasError('required') && newJobForm.controls['creator_name'].touched"
+                 class="alert alert-danger">Please enter your name.
+            </div>
+
+            <div class="unknown" [hidden]="!hasSavedCreator">
+                <p>
+                    Not {{newJobForm.controls['creator_name'].value}}? Click <a class="btn-link"
+                                                                                (click)="clearSavedCreator()">here</a>.
+                </p>
+            </div>
+
+        </div>
     </div>
-    <div class="form-group">
-        <label for="name">Job Name</label>
+
+    <div class="form-group row">
+        <label class="col-md-2 col-sm-12 col-form-label" for="creator_department">Department</label>
+        <div class="col-md-10 col-sm-12">
+            <select id="creator_department"
+                    name="creator_department"
+                    class="form-control department__list"
+                    (change)="onDepartmentSelect"
+                    [formControl]="newJobForm.controls['creator_department']"
+                    *ngIf="departmentList.length > 0">
+                <option *ngFor="let department of departmentList"
+                        value="{{department.id}}">
+                    {{department.name}}
+                </option>
+            </select>
+
+        </div>
+    </div>
+</form>
+
+<!--<div class="form-group row">
+    <label class="col-md-2 col-sm-12 col-form-label">Your Name</label>
+    <div class="col-md-10 col-sm-12">
+        <input id="creator" type="text" class="validate filter-input form-control" [required] [(ngModel)]=query
+               (keyup)=filter()
+               placeholder="Your Name">
+        <div class="suggestions">
+            <ul class="suggestions__list" *ngIf="filteredList.length > 0">
+                <li *ngFor="let creator of filteredList">
+                    <a (click)="select(creator)">{{creator.name}}</a>
+                </li>
+            </ul>
+            <div class="unknown" [hidden]="!hasTyped">
+                <p>Name not appearing? Click <a class="btn-link" data-toggle="modal" data-target="#addCreatorModal"
+                                                (click)="showUserModal()">here</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+
+
+<div class="form-group row">
+    <label class="col-md-2 col-sm-12 col-form-label" for="name">Job Name</label>
+    <div class="col-md-10 col-sm-12">
         <input type="text" class="form-control" id="name" required placeholder="Job Name">
     </div>
+</div>
 
-    <div class="form-group">
-        <label for="description">Description</label>
-        <textarea type="text" class="form-control" id="description" required placeholder="Job Description"></textarea>
+<div class="form-group row">
+    <label class="col-md-2 col-sm-12 col-form-label" for="description">Description</label>
+    <div class="col-md-10 col-sm-12">
+            <textarea type="text" class="form-control" id="description" required
+                      placeholder="Job Description"></textarea>
     </div>
+</div>
 
-    <button type="submit" class="btn btn-success">Submit</button>
+<button type="submit" (click)="this.processAddUser" class="btn btn-success">Submit</button>
 
-</form>
+<!-- Modal -->
+<div id="addCreatorModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add User</h4>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="newUserForm" (ngSubmit)="onSubmitUserForm(newUserForm.value)">
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="first_name">First Name</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="first_name"
+                                   name="first_name"
+                                   class="form-control"
+                                   placeholder="First Name"
+                                   [formControl]="newUserForm.controls['first_name']"
+                                   required
+                            />
+                            <div *ngIf="newUserForm.controls['first_name'].hasError('required') && newUserForm.controls['first_name'].touched"
+                                 class="alert alert-danger">You must include a first name.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="nickname">Nickname (if any)</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="nickname"
+                                   name="nickname"
+                                   class="form-control"
+                                   placeholder="Nickname"
+                                   [formControl]="newUserForm.controls['nickname']"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="last_name">Last Name</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="last_name"
+                                   name="last_name"
+                                   class="form-control"
+                                   placeholder="Last Name"
+                                   required
+                                   minlength="2"
+                                   [formControl]="newUserForm.controls['last_name']"/>
+
+                            <div *ngIf="newUserForm.controls['last_name'].hasError('required') && newUserForm.controls['last_name'].touched"
+                                 class="alert alert-danger">You must include a last name.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="email">Email</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="email"
+                                   name="email"
+                                   class="form-control"
+                                   placeholder="yourname@southernground.com"
+                                   required
+                                   email
+                                   [formControl]="newUserForm.controls['email']" />
+
+                            <div *ngIf="newUserForm.controls['email'].hasError('required') && ((newUserForm.controls['email'].touched) && newUserForm.controls['email'].hasError('email'))" class="alert alert-danger">
+                                You must add an email.
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="office_phone">Office Phone</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="office_phone"
+                                   name="office_phone"
+                                   class="form-control"
+                                   placeholder="XXX-XXX-XXXX ext. XXX"
+                                   [formControl]="newUserForm.controls['office_phone']"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-12 col-form-label" for="other_phone">Other Phone</label>
+                        <div class="col-sm-12">
+                            <input type="text"
+                                   id="other_phone"
+                                   name="other_phone"
+                                   class="form-control"
+                                   placeholder="XXX-XXX-XXXX"
+                                   [formControl]="newUserForm.controls['other_phone']"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-default" [disabled]="!newUserForm.valid">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
