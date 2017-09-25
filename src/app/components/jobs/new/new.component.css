@@ -47,3 +47,6 @@ select.department__list {
     color: blue;
     cursor: pointer;
 }
+.warning{
+    color: red;
+}
