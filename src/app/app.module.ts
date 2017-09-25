@@ -15,10 +15,11 @@ import {EmployeesComponent} from './components/employees/employees.component';
 import {EmployeeComponent} from './components/employee/employee.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule, Routes} from '@angular/router';
+import {CalendarModule} from 'primeng/primeng';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 const appRoutes: Routes = [
     {path: 'jobs', component: JobsComponent},
-    // { path: 'employee/:id',      component: HeroDetailComponent },
     {path: 'employees', component: EmployeesComponent},
     {path: 'home', component: HomeComponent},
     {path: 'jobs/new', component: NewComponent},
@@ -52,7 +53,9 @@ const appRoutes: Routes = [
             appRoutes
         ),
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        CalendarModule,
+        BrowserAnimationsModule
     ],
     providers: [DataService],
     bootstrap: [AppComponent]
