@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {DataService} from '../../../services/data.service';
 import {Cookies} from '../../../utilties/cookies';
 import {Creator} from '../../../models/Creator';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 
 @Component({
     selector: 'app-new',
@@ -22,6 +22,7 @@ export class NewComponent implements OnInit {
     filteredEmployeeList: Creator[] = [];
     newJobForm: FormGroup;
     newUserForm: FormGroup;
+    dueDate: Date;
     minDate: Date;
     maxDate: Date;
     invalidDates: Array<Date>;
@@ -29,8 +30,6 @@ export class NewComponent implements OnInit {
     constructor(public dataService: DataService,
                 public formBuilder: FormBuilder) {
         this.cookie = new Cookies();
-        this.newJobForm = this.getNewJobForm();
-        this.newUserForm = this.getNewUserForm();
     }
 
     clearSavedCreator() {
@@ -59,37 +58,14 @@ export class NewComponent implements OnInit {
         }
     }
 
-    getValidDueDate() {
-        const futureDueDate = new Date();
-        futureDueDate.setDate(futureDueDate.getDate() + 10);
-
-        switch (futureDueDate.getDay()) {
-            case 0:
-                futureDueDate.setDate(futureDueDate.getDate() + 1);
-                break;
-            case 6:
-                futureDueDate.setDate(futureDueDate.getDate() + 2);
-                break;
-            default:
-            // Nothing
-        }
-
-        futureDueDate.setHours(12);
-        futureDueDate.setMinutes(0);
-        futureDueDate.setSeconds(0);
-        futureDueDate.setMilliseconds(0);
-
-        return futureDueDate;
-    }
-
     getNewJobForm() {
         return this.formBuilder.group({
             creator_name: [null, Validators.required],
             creator_id: [null],
             creator_department: ['-1', Validators.required],
-            due_date: [this.getValidDueDate(), Validators.required],
-            jobTitle: [null, Validators.required],
-            jobDescription: [null]
+            due_date: [this.dueDate, Validators.required],
+            job_title: [null, Validators.required],
+            job_description: [null, Validators.required]
         });
     }
 
@@ -136,7 +112,6 @@ export class NewComponent implements OnInit {
 
     onSubmitJobForm(form: any): void {
         console.log('onSubmitJobForm::');
-        console.log(form);
     }
 
     onSubmitUserForm(form: any): void {
@@ -185,10 +160,29 @@ export class NewComponent implements OnInit {
         this.maxDate.setMonth(nextMonth);
         this.maxDate.setFullYear(nextYear);
 
-        let invalidDate = new Date();
+        this.dueDate = new Date();
+        this.dueDate.setDate(today.getDate() + 14);
+        switch (this.dueDate.getDay()) {
+            case 0:
+                this.dueDate.setDate(this.dueDate.getDate() + 1);
+                break;
+            case 6:
+                this.dueDate.setDate(this.dueDate.getDate() + 2);
+                break;
+            default:
+            // Nothing
+        }
+        this.dueDate.setHours(12);
+        this.dueDate.setMinutes(0);
+        this.dueDate.setSeconds(0);
+        this.dueDate.setMilliseconds(0);
+
+        const invalidDate = new Date();
         invalidDate.setDate(today.getDate() - 1);
         this.invalidDates = [today, invalidDate];
 
+        this.newJobForm = this.getNewJobForm();
+        this.newUserForm = this.getNewUserForm();
 
         if (creator) {
             this.hasSavedCreator = true;

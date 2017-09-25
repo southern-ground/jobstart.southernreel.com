@@ -13,8 +13,8 @@
 <form [(formGroup)]="newJobForm" (ngSubmit)="onSubmitJobForm(newJobForm.value)">
     <!-- Job Requester -->
     <div class="form-group row">
-        <label class="col-md-2 col-sm-12 col-form-label" for="creator_name">Your Name</label>
-        <div class="col-md-10 col-sm-12">
+        <label class="col-md-3 col-sm-12 col-form-label" for="creator_name">Your Name</label>
+        <div class="col-md-9 col-sm-12">
             <input id="creator_name"
                    name="creator_name"
                    class="validate filter-input form-control"
@@ -53,8 +53,8 @@
     </div>
     <!-- Job Department -->
     <div class="form-group row">
-        <label class="col-md-2 col-sm-12 col-form-label" for="creator_department">Department</label>
-        <div class="col-md-10 col-sm-12">
+        <label class="col-md-3 col-sm-12 col-form-label" for="creator_department">Department</label>
+        <div class="col-md-9 col-sm-12">
             <select id="creator_department"
                     name="creator_department"
                     class="form-control department__list"
@@ -70,8 +70,8 @@
     </div>
     <!-- Job Due Date -->
     <div class="form-group row">
-        <label class="col-md-2 col-sm-12 col-form-label" for="due_date">Due Date</label>
-        <div class="col-md-10 col-sm-12">
+        <label class="col-md-3 col-sm-12 col-form-label" for="due_date">Due Date</label>
+        <div class="col-md-9 col-sm-12">
             <div style="display:inline-block">
                 <p-calendar name="due_date"
                             id="due_date"
@@ -81,18 +81,52 @@
                             [disabledDays]="[0,6]"
                             [minDate]="minDate"
                             [maxDate]="maxDate"
-                            formControlName="due_date"></p-calendar>
+                            formControlName="due_date"
+                            [showIcon]="true"
+                ></p-calendar>
             </div>
-            <div *ngIf="newJobForm.controls['due_date'].touched && (newJobForm.controls['due_date'].hasError('required') || newJobForm.controls['due_date'].hasError('min'))"
-                 class="alert alert-danger">Please enter your name.
+            <div *ngIf="newJobForm.controls['due_date'].touched && newJobForm.controls['due_date'].hasError('required')"
+                 class="alert alert-danger">Please select a valid date.
             </div>
         </div>
-
-
     </div>
+    <!-- Job Title -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label" for="job_title">Job Title</label>
+        <div class="col-md-9 col-sm-12">
+            <input type="text"
+                   id="job_title"
+                   name="job_title"
+                   class="validate filter-input form-control"
+                   formControlName="job_title"
+                   required/>
+            <div *ngIf="newJobForm.controls['job_title'].touched && newJobForm.controls['job_title'].hasError('required')"
+                 class="alert alert-danger">Please enter a job title.
+            </div>
+        </div>
+    </div>
+    <!-- Job Description -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label" for="job_description">Job Description</label>
+        <div class="col-md-9 col-sm-12">
+            <textarea id="job_description"
+                      name="job_description"
+                      class="validate filter-input form-control"
+                      formControlName="job_description"
+                      maxlength="150"
+                      required>
+            </textarea>
+            <small>Characters remaining: <span
+                    [ngClass]="{'warning': (newJobForm.controls['job_description'].value && (150-newJobForm.controls['job_description'].value.length <= 10))}">{{150-(newJobForm.controls['job_description'].value ? newJobForm.controls['job_description'].value.length : 0)}}</span>
+            </small>
+            <div *ngIf="newJobForm.controls['job_description'].touched && newJobForm.controls['job_description'].hasError('required')"
+                 class="alert alert-danger">Please enter a job description.
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success" [disabled]="!newJobForm.valid">Submit</button>
 </form>
 
-<button type="submit" (click)="this.processAddUser" class="btn btn-success">Submit</button>
 
 
 <!-- Modal -->
