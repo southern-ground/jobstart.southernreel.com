@@ -1,2 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+
+span.ui-button-text.ui-clickable{
+    display: none !important;
+}
+.ui-datepicker-header{
+    text-align: center;
+    font-weight: bold;
+}
+.ui-datepicker-prev, .ui-datepicker-next{
+    width: 40px;
+    height: 40px;
+    border: 1px solid #c7c7c7;
+    top: 0 !important;
+}
+.ui-datepicker-header a{
+    position: relative;
+}
+.ui-datepicker-prev:before, .ui-datepicker-next:before{
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
