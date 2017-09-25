@@ -10,7 +10,8 @@
     This is the page where the workflow for creating a new job will begin.
 </p>
 
-<form [formGroup]="newJobForm" (ngSubmit)="onSubmitJobForm(newJobForm.value)">
+<form [(formGroup)]="newJobForm" (ngSubmit)="onSubmitJobForm(newJobForm.value)">
+    <!-- Job Requester -->
     <div class="form-group row">
         <label class="col-md-2 col-sm-12 col-form-label" for="creator_name">Your Name</label>
         <div class="col-md-10 col-sm-12">
@@ -18,7 +19,7 @@
                    name="creator_name"
                    class="validate filter-input form-control"
                    placeholder="Your Name"
-                   [formControl]="newJobForm.controls['creator_name']"
+                   formControlName="creator_name"
                    type="text"
                    [required]
                    (keyup)=filterEmployees()>
@@ -50,14 +51,13 @@
 
         </div>
     </div>
-
+    <!-- Job Department -->
     <div class="form-group row">
         <label class="col-md-2 col-sm-12 col-form-label" for="creator_department">Department</label>
         <div class="col-md-10 col-sm-12">
             <select id="creator_department"
                     name="creator_department"
                     class="form-control department__list"
-                    (change)="onDepartmentSelect"
                     [formControl]="newJobForm.controls['creator_department']"
                     *ngIf="departmentList.length > 0">
                 <option *ngFor="let department of departmentList"
@@ -68,46 +68,32 @@
 
         </div>
     </div>
-</form>
-
-<!--<div class="form-group row">
-    <label class="col-md-2 col-sm-12 col-form-label">Your Name</label>
-    <div class="col-md-10 col-sm-12">
-        <input id="creator" type="text" class="validate filter-input form-control" [required] [(ngModel)]=query
-               (keyup)=filter()
-               placeholder="Your Name">
-        <div class="suggestions">
-            <ul class="suggestions__list" *ngIf="filteredList.length > 0">
-                <li *ngFor="let creator of filteredList">
-                    <a (click)="select(creator)">{{creator.name}}</a>
-                </li>
-            </ul>
-            <div class="unknown" [hidden]="!hasTyped">
-                <p>Name not appearing? Click <a class="btn-link" data-toggle="modal" data-target="#addCreatorModal"
-                                                (click)="showUserModal()">here</a>.</p>
+    <!-- Job Due Date -->
+    <div class="form-group row">
+        <label class="col-md-2 col-sm-12 col-form-label" for="due_date">Due Date</label>
+        <div class="col-md-10 col-sm-12">
+            <div style="display:inline-block">
+                <p-calendar name="due_date"
+                            id="due_date"
+                            formGroupName="due_date"
+                            dateFormat="mm/dd/yy"
+                            [disabledDates]="invalidDates"
+                            [disabledDays]="[0,6]"
+                            [minDate]="minDate"
+                            [maxDate]="maxDate"
+                            formControlName="due_date"></p-calendar>
+            </div>
+            <div *ngIf="newJobForm.controls['due_date'].touched && (newJobForm.controls['due_date'].hasError('required') || newJobForm.controls['due_date'].hasError('min'))"
+                 class="alert alert-danger">Please enter your name.
             </div>
         </div>
+
+
     </div>
-</div>-->
-
-
-
-<div class="form-group row">
-    <label class="col-md-2 col-sm-12 col-form-label" for="name">Job Name</label>
-    <div class="col-md-10 col-sm-12">
-        <input type="text" class="form-control" id="name" required placeholder="Job Name">
-    </div>
-</div>
-
-<div class="form-group row">
-    <label class="col-md-2 col-sm-12 col-form-label" for="description">Description</label>
-    <div class="col-md-10 col-sm-12">
-            <textarea type="text" class="form-control" id="description" required
-                      placeholder="Job Description"></textarea>
-    </div>
-</div>
+</form>
 
 <button type="submit" (click)="this.processAddUser" class="btn btn-success">Submit</button>
+
 
 <!-- Modal -->
 <div id="addCreatorModal" class="modal fade" role="dialog">
@@ -174,9 +160,10 @@
                                    placeholder="yourname@southernground.com"
                                    required
                                    email
-                                   [formControl]="newUserForm.controls['email']" />
+                                   [formControl]="newUserForm.controls['email']"/>
 
-                            <div *ngIf="newUserForm.controls['email'].hasError('required') && ((newUserForm.controls['email'].touched) && newUserForm.controls['email'].hasError('email'))" class="alert alert-danger">
+                            <div *ngIf="newUserForm.controls['email'].hasError('required') && ((newUserForm.controls['email'].touched) && newUserForm.controls['email'].hasError('email'))"
+                                 class="alert alert-danger">
                                 You must add an email.
                             </div>
 
@@ -205,7 +192,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-default" [disabled]="!newUserForm.valid">Submit</button>
+                        <button type="submit" class="btn btn-default" [disabled]="!newUserForm.valid">Submit
+                        </button>
                     </div>
 
                 </form>

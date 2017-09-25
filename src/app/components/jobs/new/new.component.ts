@@ -3,32 +3,32 @@ import {DataService} from '../../../services/data.service';
 import {Cookies} from '../../../utilties/cookies';
 import {Creator} from '../../../models/Creator';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {guid} from '../../../utilties/utilities';
 
 @Component({
     selector: 'app-new',
     templateUrl: './new.component.html',
     styleUrls: ['./new.component.css']
 })
+
 export class NewComponent implements OnInit {
     cookie: Cookies;
-    departmentList: object[] = [{id: "-1", name: '---'}];
-    formBuilder: FormBuilder;
-    service: DataService;
-    hasSavedCreator: boolean = false;
-    hasLoaded: boolean = false;
-    hasTyped: boolean = false;
-    hasSelected: boolean = false;
+    departmentList: object[] = [{id: '-1', name: '---'}];
+    hasSavedCreator = false;
+    hasLoaded = false;
+    hasTyped = false;
+    hasSelected = false;
     creators: Creator[];
     creator: Creator;
     filteredEmployeeList: Creator[] = [];
     newJobForm: FormGroup;
     newUserForm: FormGroup;
+    minDate: Date;
+    maxDate: Date;
+    invalidDates: Array<Date>;
 
-    constructor(public dataService: DataService, private fb: FormBuilder) {
+    constructor(public dataService: DataService,
+                public formBuilder: FormBuilder) {
         this.cookie = new Cookies();
-        this.service = this.dataService;
-        this.formBuilder = fb;
         this.newJobForm = this.getNewJobForm();
         this.newUserForm = this.getNewUserForm();
     }
@@ -46,7 +46,8 @@ export class NewComponent implements OnInit {
     }
 
     filterEmployees() {
-        let query = this.newJobForm.controls['creator_name'].value;
+        this.hasSavedCreator = false;
+        const query = this.newJobForm.controls['creator_name'].value;
         if (query !== '') {
             this.filteredEmployeeList = this.creators.filter(function (el) {
                 return el.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
@@ -58,11 +59,35 @@ export class NewComponent implements OnInit {
         }
     }
 
+    getValidDueDate() {
+        const futureDueDate = new Date();
+        futureDueDate.setDate(futureDueDate.getDate() + 10);
+
+        switch (futureDueDate.getDay()) {
+            case 0:
+                futureDueDate.setDate(futureDueDate.getDate() + 1);
+                break;
+            case 6:
+                futureDueDate.setDate(futureDueDate.getDate() + 2);
+                break;
+            default:
+            // Nothing
+        }
+
+        futureDueDate.setHours(12);
+        futureDueDate.setMinutes(0);
+        futureDueDate.setSeconds(0);
+        futureDueDate.setMilliseconds(0);
+
+        return futureDueDate;
+    }
+
     getNewJobForm() {
         return this.formBuilder.group({
             creator_name: [null, Validators.required],
             creator_id: [null],
             creator_department: ['-1', Validators.required],
+            due_date: [this.getValidDueDate(), Validators.required],
             jobTitle: [null, Validators.required],
             jobDescription: [null]
         });
@@ -98,8 +123,8 @@ export class NewComponent implements OnInit {
         this.hasSelected = this.hasSavedCreator = true;
         this.dataService.getEmployee(employee.employee_id)
             .subscribe(res => {
-                let deptId: string = (res.employee.departments.length >= 1) ? res.employee.departments[0].department_id : '';
-                let dept: object[] = (this.departmentList.filter(d => {
+                const deptId: string = (res.employee.departments.length >= 1) ? res.employee.departments[0].department_id : '';
+                const dept: object[] = (this.departmentList.filter(d => {
                     return d['id'] === deptId;
                 }));
                 if (dept.length >= 1) {
@@ -115,23 +140,55 @@ export class NewComponent implements OnInit {
     }
 
     onSubmitUserForm(form: any): void {
-        this.service.addEmployee(form)
+        this.dataService.addEmployee(form)
             .subscribe(res => {
                 if (res.error === 200) {
                     // Successfully added the User
-                    this.newJobForm.controls['creator_name'].setValue(res.user.first_name
-                        + (res.user.nickname === '' ? '' : ' ' + res.user.nickname) + ' '
-                        + res.user.last_name);
+                    const $ = window['$'];
+                    const newCreatorName = res.user.first_name
+                        + (res.user.nickname === '' ? '' : ' "' + res.user.nickname) + '" '
+                        + res.user.last_name;
+
+                    this.creator = {
+                        id: res.user.id,
+                        employee_id: res.user.employee_id,
+                        name: newCreatorName
+                    };
+
+                    this.newJobForm.controls['creator_name'].setValue(this.creator.name);
+                    this.newJobForm.controls['creator_id'].setValue(this.creator.employee_id);
+                    this.cookie.setJobstartCreator(this.creator.name, this.creator.employee_id);
+
+                    $('#addCreatorModal div.modal-header button').click();
                 } else {
-                    alert('Error ' + res.error + ": " + res.message);
+                    alert('Error ' + res.error + ': ' + res.message);
                     this.newUserForm = this.getNewUserForm();
                 }
             });
     }
 
     ngOnInit() {
-        let creator = this.cookie.getJobstartCreator();
-        let creatorDepartmentId = this.cookie.getCreatorDepartment();
+
+        const creator = this.cookie.getJobstartCreator();
+        const creatorDepartmentId = this.cookie.getCreatorDepartment();
+
+        let today = new Date();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let nextMonth = (month === 11) ? 0 : month + 1;
+        let nextYear = year + 1;
+
+        this.minDate = new Date();
+        this.minDate.setDate(today.getDate() + 3);
+
+        this.maxDate = new Date();
+        this.maxDate.setMonth(nextMonth);
+        this.maxDate.setFullYear(nextYear);
+
+        let invalidDate = new Date();
+        invalidDate.setDate(today.getDate() - 1);
+        this.invalidDates = [today, invalidDate];
+
 
         if (creator) {
             this.hasSavedCreator = true;
@@ -143,11 +200,11 @@ export class NewComponent implements OnInit {
             this.newJobForm.controls['creator_department'].setValue(creatorDepartmentId.id);
         }
 
-        this.service.getEmployees()
+        this.dataService.getEmployees()
             .subscribe(res => {
                 this.creators = res.employees.map(e => {
                     let name = e.first_name;
-                    name += (e.nickname === '' ? '' : ' ' + e.nickname);
+                    name += (e.nickname === '' ? '' : ' "' + e.nickname + '"');
                     name += ' ' + e.last_name;
                     return {
                         employee_id: e.employee_id,
@@ -157,7 +214,7 @@ export class NewComponent implements OnInit {
                 });
                 this.dataLoaded();
             });
-        this.service.getDepartments()
+        this.dataService.getDepartments()
             .subscribe(res => {
                 let departments: object[] = res.departments;
                 departments.unshift({id: -1, name: '---'});
