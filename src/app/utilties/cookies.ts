@@ -1,5 +1,3 @@
-import {current} from 'codelyzer/util/syntaxKind';
-
 export class Cookies {
 
     readonly COOKIE_NAME: string = "jobstart.southernreel.com";
@@ -40,18 +38,9 @@ export class Cookies {
         document.cookie = `${name}=${value}; ${expires}${cpath}`;
     }
 
-    private consent(isRegistered: boolean, e: any) {
-        if (!isRegistered) {
-            return this.isRegistered;
-        } else if (isRegistered) {
-            this.setCookie(this.COOKIE_NAME, '1', this.COOKIE_EXPIRE_DAYS);
-            this.isRegistered = true;
-            e.preventDefault();
-        }
-    }
-
     public deleteJobstartCreator() {
         this.deleteCookie(this.JOBSTART_CREATOR);
+        this.deleteCookie(this.JOBSTART_CREATOR_DEPARTMENT);
     }
 
     public getCreatorDepartment() {
