@@ -68,9 +68,24 @@
 
         </div>
     </div>
+    <!-- Job Title -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label required" for="job_title">Job Title</label>
+        <div class="col-md-9 col-sm-12">
+            <input type="text"
+                   id="job_title"
+                   name="job_title"
+                   class="validate filter-input form-control"
+                   formControlName="job_title"
+                   placeholder="Job Title"/>
+            <div *ngIf="newJobForm.controls['job_title'].touched && newJobForm.controls['job_title'].hasError('required')"
+                 class="alert alert-danger">Please enter a job title.
+            </div>
+        </div>
+    </div>
     <!-- Job Due Date -->
     <div class="form-group row">
-        <label class="col-md-3 col-sm-12 col-form-label" for="due_date">Due Date</label>
+        <label class="col-md-3 col-sm-12 col-form-label required" for="due_date">Due Date</label>
         <div class="col-md-9 col-sm-12">
             <div style="display:inline-block">
                 <p-calendar name="due_date"
@@ -90,33 +105,38 @@
             </div>
         </div>
     </div>
-    <!-- Job Title -->
+    <!-- Additional Dates -->
     <div class="form-group row">
-        <label class="col-md-3 col-sm-12 col-form-label" for="job_title">Job Title</label>
+        <label class="col-md-3 col-sm-12 col-form-label" for="additional_dates">Additional Dates</label>
         <div class="col-md-9 col-sm-12">
-            <input type="text"
-                   id="job_title"
-                   name="job_title"
-                   class="validate filter-input form-control"
-                   formControlName="job_title"
-                   required/>
-            <div *ngIf="newJobForm.controls['job_title'].touched && newJobForm.controls['job_title'].hasError('required')"
-                 class="alert alert-danger">Please enter a job title.
-            </div>
+            <textarea id="additional_dates"
+                      name="additional_dates"
+                      class="validate filter-input form-control"
+                      formControlName="additional_dates"
+                      maxlength="150"
+                      placeholder="Other important dates after {{newJobForm.controls['due_date'].value | date: 'MM/dd/yyyy'}}"></textarea>
+
+            <small [hidden]="newJobForm.controls['additional_dates'].value.length === 0">
+                <strong>Please Note:</strong> Additional Dates must be <em>after</em> the Due Date of {{newJobForm.controls['due_date'].value | date: 'MM/dd/yyyy'}}.
+                <br/>
+                Characters remaining: <span
+                    [ngClass]="{'warning': (newJobForm.controls['additional_dates'].value && (150-newJobForm.controls['additional_dates'].value.length <= 10))}">
+                {{150-(newJobForm.controls['additional_dates'].value ? newJobForm.controls['additional_dates'].value.length : 0)}}</span>
+            </small>
         </div>
     </div>
     <!-- Job Description -->
     <div class="form-group row">
-        <label class="col-md-3 col-sm-12 col-form-label" for="job_description">Job Description</label>
+        <label class="col-md-3 col-sm-12 col-form-label required" for="job_description">Job Description</label>
         <div class="col-md-9 col-sm-12">
             <textarea id="job_description"
                       name="job_description"
                       class="validate filter-input form-control"
                       formControlName="job_description"
-                      maxlength="150"
-                      required>
+                      placeholder="Job Description"
+                      maxlength="150">
             </textarea>
-            <small>Characters remaining: <span
+            <small [hidden]="newJobForm.controls['job_description'].value.length===0">Characters remaining: <span
                     [ngClass]="{'warning': (newJobForm.controls['job_description'].value && (150-newJobForm.controls['job_description'].value.length <= 10))}">{{150-(newJobForm.controls['job_description'].value ? newJobForm.controls['job_description'].value.length : 0)}}</span>
             </small>
             <div *ngIf="newJobForm.controls['job_description'].touched && newJobForm.controls['job_description'].hasError('required')"
@@ -124,9 +144,95 @@
             </div>
         </div>
     </div>
+    <!-- Needs -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label">What services does your project require? <br /> <small>(Check all that apply)</small></label>
+        <div class="col-md-9 col-sm-12">
+            <!-- Creative -->
+            <input type="checkbox"
+                   id="has_creative"
+                   name="has_creative"
+                   formControlName="has_creative"/> <label for="has_creative">Creative</label> <br/>
+            <!-- Web -->
+            <input type="checkbox"
+                   id="has_web"
+                   name="has_web"
+                   formControlName="has_web"/> <label for="has_web">Web</label> <br/>
+            <!-- Public Relations -->
+            <input type="checkbox"
+                   id="has_pr"
+                   name="has_pr"
+                   formControlName="has_pr"/> <label for="has_pr">Public Relations</label> <br/>
+            <!-- Social Media -->
+            <input type="checkbox"
+                   id="has_social"
+                   name="has_social"
+                   formControlName="has_social"/> <label for="has_social">Social Media</label> <br/>
+            <!-- Photo/Video/Editing -->
+            <input type="checkbox"
+                   id="has_photo"
+                   name="has_photo"
+                   formControlName="has_photo"/> <label for="has_photo">Photo/Video/Editing</label>
+
+        </div>
+    </div>
+    <!-- Deliverables -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label required" for="job_deliverables">List of Deliverables</label>
+        <div class="col-md-9 col-sm-12">
+            <textarea id="job_deliverables"
+                      name="job_deliverables"
+                      class="validate filter-input form-control"
+                      formControlName="job_deliverables"
+                      placeholder="For this job I expect to receive ..."
+                      maxlength="150">
+            </textarea>
+            <small [hidden]="newJobForm.controls['job_deliverables'].value.length===0">Characters remaining: <span
+                    [ngClass]="{'warning': (newJobForm.controls['job_deliverables'].value && (150-newJobForm.controls['job_deliverables'].value.length <= 10))}">{{150-(newJobForm.controls['job_deliverables'].value ? newJobForm.controls['job_deliverables'].value.length : 0)}}</span>
+            </small>
+            <div *ngIf="newJobForm.controls['job_deliverables'].touched && newJobForm.controls['job_deliverables'].hasError('required')"
+                 class="alert alert-danger">Please enter your expected deliverables.
+            </div>
+        </div>
+    </div>
+    <!-- Kickoff Availability -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label required" for="kickoff_availability">Please provide your availability for a kickoff meeting <br /> <small>(We will contact you to set up a meeting if necessary.)</small></label>
+        <div class="col-md-9 col-sm-12">
+            <textarea id="kickoff_availability"
+                      name="kickoff_availability"
+                      class="validate filter-input form-control"
+                      formControlName="kickoff_availability"
+                      placeholder="My availability is ..."
+                      maxlength="150 ">
+            </textarea>
+            <small [hidden]="newJobForm.controls['kickoff_availability'].value.length === 0">Characters remaining: <span
+                    [ngClass]="{'warning': (newJobForm.controls['kickoff_availability'].value && (150-newJobForm.controls['kickoff_availability'].value.length <= 10))}">{{150-(newJobForm.controls['kickoff_availability'].value ? newJobForm.controls['kickoff_availability'].value.length : 0)}}</span>
+            </small>
+        </div>
+    </div>
+    <!-- Other People -->
+    <div class="form-group row">
+        <label class="col-md-3 col-sm-12 col-form-label" for="other_people">
+            Please check additional people who should be added to the Basecamp <br /> <small>(If it's your entire department, just say 'entire department')</small>
+        </label>
+        <div class="col-md-9 col-sm-12">
+            <textarea id="other_people"
+                      name="other_people"
+                      class="validate filter-input form-control"
+                      formControlName="other_people"
+                      placeholder="Please add ...">
+            </textarea>
+            <small [hidden]="newJobForm.controls['other_people'].value.length === 0">Characters remaining: <span
+                    [ngClass]="{'warning': (newJobForm.controls['other_people'].value && (150-newJobForm.controls['other_people'].value.length <= 10))}">{{150-(newJobForm.controls['other_people'].value ? newJobForm.controls['other_people'].value.length : 0)}}</span>
+            </small>
+        </div>
+    </div>
+
+    <p [hidden]="newJobForm.valid"><small><span class="required">*</span> Required field.</small></p>
+
     <button type="submit" class="btn btn-success" [disabled]="!newJobForm.valid">Submit</button>
 </form>
-
 
 
 <!-- Modal -->
