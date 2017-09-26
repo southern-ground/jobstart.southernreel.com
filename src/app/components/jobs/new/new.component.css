@@ -39,7 +39,7 @@ select.department__list {
     border-bottom: 1px solid lightblue;
 }
 .unknown{
-    margin: 10px 10px;
+    margin: 10px 10px 0;
     font-style: italic;
     font-size: 0.8rem;
 }
@@ -49,4 +49,13 @@ select.department__list {
 }
 .warning{
     color: red;
+}
+
+span.required{
+    color: rgba(255,0,0,0.7);
+}
+
+label.required:after{
+    content: "*";
+    color: rgba(255,0,0,0.7);
 }
