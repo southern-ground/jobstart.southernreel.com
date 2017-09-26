@@ -13,7 +13,7 @@
 <form [(formGroup)]="newJobForm" (ngSubmit)="onSubmitJobForm(newJobForm.value)">
     <!-- Job Requester -->
     <div class="form-group row">
-        <label class="col-md-3 col-sm-12 col-form-label" for="creator_name">Your Name</label>
+        <label class="col-md-3 col-sm-12 col-form-label required" for="creator_name">Your Name</label>
         <div class="col-md-9 col-sm-12">
             <input id="creator_name"
                    name="creator_name"
