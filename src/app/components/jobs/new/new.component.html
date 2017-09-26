@@ -38,11 +38,11 @@
                 </div>
             </div>
 
-            <div *ngIf="newJobForm.controls['creator_name'].hasError('required') && newJobForm.controls['creator_name'].touched"
+            <div [hidden]="hasSavedCreator" *ngIf="newJobForm.controls['creator_name'].hasError('required') && newJobForm.controls['creator_name'].touched"
                  class="alert alert-danger">Please enter your name.
             </div>
 
-            <div class="unknown" [hidden]="!hasSavedCreator">
+            <div *ngIf="hasSavedCreator" class="unknown" [hidden]="!hasSavedCreator">
                 <p>
                     Not {{newJobForm.controls['creator_name'].value}}? Click <a class="btn-link"
                                                                                 (click)="clearSavedCreator()">here</a>.
