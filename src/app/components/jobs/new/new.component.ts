@@ -64,8 +64,17 @@ export class NewComponent implements OnInit {
             creator_id: [null],
             creator_department: ['-1', Validators.required],
             due_date: [this.dueDate, Validators.required],
+            additional_dates: [''],
             job_title: [null, Validators.required],
-            job_description: [null, Validators.required]
+            job_description: ['', Validators.required],
+            has_creative: false,
+            has_web: false,
+            has_pr: false,
+            has_social: false,
+            has_photo: false,
+            job_deliverables: ['', Validators.required],
+            kickoff_availability: ['', Validators.required],
+            other_people: ['']
         });
     }
 
@@ -112,6 +121,7 @@ export class NewComponent implements OnInit {
 
     onSubmitJobForm(form: any): void {
         console.log('onSubmitJobForm::');
+        console.dir(form);
     }
 
     onSubmitUserForm(form: any): void {
