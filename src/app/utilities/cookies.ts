@@ -1,3 +1,5 @@
+import {Creator} from '../models/Creator';
+
 export class Cookies {
 
     readonly COOKIE_NAME: string = "jobstart.southernreel.com";
@@ -65,10 +67,7 @@ export class Cookies {
         return null;
     }
 
-    public setJobstartCreator(name: string, id: string) {
-        this.setCookie(this.JOBSTART_CREATOR, JSON.stringify({
-            name: name,
-            id: id
-        }), this.COOKIE_EXPIRE_DAYS);
+    public setJobstartCreator(employee: Creator) {
+        this.setCookie(this.JOBSTART_CREATOR, JSON.stringify(employee), this.COOKIE_EXPIRE_DAYS);
     }
 }
