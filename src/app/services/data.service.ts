@@ -26,12 +26,21 @@ export class DataService {
     }
 
     addEmployee(emp: object) {
-        console.log('DataService::addEmployee');
         let url = this._urlPrefix + '/api/employee/add/';
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http
             .put(url, JSON.stringify(emp), headers)
+            .map(res => res.json());
+
+    }
+
+    addJobstart(job: object){
+        let url = this._urlPrefix + '/api/add/job/';
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        return this.http
+            .put(url, JSON.stringify(job), headers)
             .map(res => res.json());
     }
 
@@ -67,7 +76,7 @@ export class DataService {
                     const departments = emp.employee.departments || [];
                     const employee = {
                         ...emp.employee,
-                        department: departments[0] || -1,
+                        department: departments[0]['department_id'] || -1,
                         full_name: this.getFullName(emp.employee),
                         hidden: false
                     }

@@ -26,6 +26,7 @@ export class NewComponent implements OnInit {
     minDate: Date;
     newJobForm: FormGroup;
     newUserForm: FormGroup;
+    addUserFormDisabled: boolean = false;
 
     constructor(private dataService: DataService,
                 private formBuilder: FormBuilder) {
@@ -75,15 +76,13 @@ export class NewComponent implements OnInit {
             first_name: [null, Validators.required],
             nickname: '',
             last_name: [null, Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
+            department: ["-1", Validators.required],
+            department_list: [],
             email: [null, Validators.compose([Validators.required, Validators.email])],
             office_phone: '',
             other_phone: '',
             deleted: '0'
         });
-    }
-
-    onDepartmentSelect(e) {
-        console.log('onDepartmentSelect', e);
     }
 
     onSelectCreator(employee) {
@@ -115,39 +114,36 @@ export class NewComponent implements OnInit {
     onSubmitJobForm(form: any): void {
         console.log('onSubmitJobForm::');
         console.dir(form);
+        this.dataService.addJobstart(form)
+            .subscribe(res => {
+                if (res['error'] === 200) {
+                    // Job successfully added.
+                } else {
+                    // Something went pear-shaped.
+                    alert('Error ' + res['error'] + ': ' + res['message']);
+                }
+            });
     }
 
     onSubmitUserForm(form: any): void {
-        console.error('onSubmitUserForm');
         this.dataService.addEmployee(form)
-            .subscribe(res => {
-                if (res.error === 200) {
+            .subscribe(addResponse => {
+                if (addResponse.error === 200) {
                     // Successfully added the User
-                    const id = res['user']['employee_id'];
+                    this.addUserFormDisabled = true;
                     this.employees = [];
+                    const id = addResponse['user']['employee_id'];
                     this.dataService.getEmployees()
-                        .subscribe(res => {
-                            this.employees.push(res);
+                        .subscribe(employeesResponse => {
+                            this.employees = employeesResponse;
+                            if (employeesResponse['employee_id'] === id) {
+                                this.onSelectCreator(employeesResponse);
+                                this.addUserFormDisabled = false;
+                                window['jQuery']('#addCreatorModal div.modal-header button').click();
+                            }
                         });
-                    this.dataService.getEmployee(id)
-                        .subscribe(res=>{
-                            console.log(res);
-                        });
-
-                    /*const newCreatorName = res.user.first_name
-                        + (res.user.nickname === '' ? '' : ' "' + res.user.nickname) + '" '
-                        + res.user.last_name;
-
-                    this.creator = {...res, full_name:newCreatorName};
-
-                    this.newJobForm.controls['creator_name'].setValue(this.creator.full_name);
-                    this.newJobForm.controls['creator_id'].setValue(this.creator.employee_id);
-                    this.cookie.setJobstartCreator(this.creator);
-
-                    $('#addCreatorModal div.modal-header button').click();
-                    */
                 } else {
-                    alert('Error ' + res.error + ': ' + res.message);
+                    alert('Error ' + addResponse.error + ': ' + addResponse.message);
                     this.newUserForm = this.getNewUserForm();
                 }
             });
@@ -202,37 +198,23 @@ export class NewComponent implements OnInit {
 
         this.dataService.getCurrentUser()
             .subscribe(res => {
-                if(res){
+                if (res) {
                     this.currentUser = res as Employee;
                     this.newJobForm.controls['creator_name'].setValue(this.currentUser.full_name);
                     this.newJobForm.controls['creator_id'].setValue(this.currentUser.employee_id);
-                    if(!this.currentUser.department){
+                    if (!this.currentUser.department) {
                         this.dataService.getEmployee(this.currentUser.employee_id)
-                            .subscribe(res=>{
+                            .subscribe(res => {
                                 this.currentUser.department = res['department'];
                                 this.newJobForm.controls['creator_department'].setValue(this.currentUser['department']['department_id']);
                                 this.dataService.updateCurrentUser(this.currentUser);
                             });
-                    }else{
+                    } else {
                         this.newJobForm.controls['creator_department'].setValue(this.currentUser['department']['department_id']);
                     }
                 }
 
             });
-
-        /*
-
-        console.log(user);
-        this.hasSavedCreator = true;
-        this.creator = user;
-        this.newJobForm.controls['creator_name'].setValue(this.creator.full_name);
-        this.newJobForm.controls['creator_id'].setValue(this.creator.id);
-
-        if (creatorDepartmentId && this.creator.employee_id) {
-        creatorDepartmentId = this.cookie.getCreatorDepartment();
-        this.newJobForm.controls['creator_department'].setValue(creatorDepartmentId.id);
-        }
-        */
 
         this.dataService.getEmployees()
             .subscribe(res => {
@@ -252,11 +234,16 @@ export class NewComponent implements OnInit {
             // TODO: Determine if this is necessary.
         });
 
-        this.dataService.currentUser$.subscribe(res=>{
-            console.log('NewComponent::this.dataService.currentUser$', res);
-            if(res){
+        /*
+        this.newUserForm.valueChanges.subscribe(data => {
+            // TODO: Determine if this is necessary.
+        });
+        */
+
+        this.dataService.currentUser$.subscribe(res => {
+            if (res) {
                 this.currentUser = res;
-            }else{
+            } else {
                 // Clearing it out.
                 this.employee = this.currentUser = res;
                 this.newJobForm.controls['creator_name'].setValue(null);
