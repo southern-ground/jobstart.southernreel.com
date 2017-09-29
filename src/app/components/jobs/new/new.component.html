@@ -1,4 +1,4 @@
-<div class="blocker" [hidden]="hasLoaded">
+<div class="blocker" [hidden]="dataLoaded">
     <p>Loading ...</p>
 </div>
 
@@ -25,9 +25,9 @@
                    (keyup)=filterEmployees()>
             <div class="suggestions">
                 <ul class="suggestions__list"
-                    *ngIf="filteredEmployeeList.length > 0">
-                    <li *ngFor="let creator of filteredEmployeeList">
-                        <a (click)="onSelectCreator(creator)">{{creator.name}}</a>
+                    *ngIf="filteredEmployeeList">
+                    <li *ngFor="let employee of filteredEmployeeList">
+                        <a (click)="onSelectCreator(employee)">{{employee.full_name}}</a>
                     </li>
                 </ul>
                 <div class="unknown" [hidden]="!hasTyped">
@@ -38,11 +38,11 @@
                 </div>
             </div>
 
-            <div [hidden]="hasSavedCreator" *ngIf="newJobForm.controls['creator_name'].hasError('required') && newJobForm.controls['creator_name'].touched"
+            <div [hidden]="currentUser" *ngIf="newJobForm.controls['creator_name'].hasError('required') && newJobForm.controls['creator_name'].touched"
                  class="alert alert-danger">Please enter your name.
             </div>
 
-            <div *ngIf="hasSavedCreator" class="unknown" [hidden]="!hasSavedCreator">
+            <div *ngIf="currentUser" class="unknown" [hidden]="!currentUser">
                 <p>
                     Not {{newJobForm.controls['creator_name'].value}}? Click <a class="btn-link"
                                                                                 (click)="clearSavedCreator()">here</a>.
@@ -59,7 +59,7 @@
                     name="creator_department"
                     class="form-control department__list"
                     [formControl]="newJobForm.controls['creator_department']"
-                    *ngIf="departmentList.length > 0">
+                    *ngIf="departmentList">
                 <option *ngFor="let department of departmentList"
                         value="{{department.id}}">
                     {{department.name}}
