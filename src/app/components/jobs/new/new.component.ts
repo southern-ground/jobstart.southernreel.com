@@ -3,6 +3,7 @@ import {DataService} from '../../../services/data.service';
 import {Employee} from '../../../models/Employee';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Observable} from 'rxjs/Observable';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-new',
@@ -29,7 +30,8 @@ export class NewComponent implements OnInit {
     addUserFormDisabled: boolean = false;
 
     constructor(private dataService: DataService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                private router:Router) {
     }
 
     clearSavedCreator() {
@@ -118,6 +120,7 @@ export class NewComponent implements OnInit {
             .subscribe(res => {
                 if (res['error'] === 200) {
                     // Job successfully added.
+                    this.router.navigate(["/job/" + res['job_id']]);
                 } else {
                     // Something went pear-shaped.
                     alert('Error ' + res['error'] + ': ' + res['message']);
