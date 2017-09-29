@@ -1,11 +1,13 @@
-import {Creator} from '../models/Creator';
+import {Employee} from '../models/Employee';
+import {DataService} from '../services/data.service';
 
 export class Cookies {
 
-    readonly COOKIE_NAME: string = "jobstart.southernreel.com";
-    readonly JOBSTART_CREATOR: string = "creator";
-    readonly JOBSTART_CREATOR_DEPARTMENT: string = "creator_department";
-    readonly COOKIE_EXPIRE_DAYS: number = 5;
+    private readonly COOKIE_NAME: string = "jobstart.southernreel.com";
+    private readonly JOBSTART_CREATOR: string = "creator";
+    private readonly JOBSTART_CREATOR_DEPARTMENT: string = "creator_department";
+    private readonly COOKIE_EXPIRE_DAYS: number = 5;
+
     private isRegistered: boolean = false;
 
     constructor() {
@@ -17,14 +19,12 @@ export class Cookies {
         let caLen: number = ca.length;
         let cookieName = `${name}=`;
         let c: string;
-
         for (let i: number = 0; i < caLen; i += 1) {
             c = ca[i].replace(/^\s+/g, '');
             if (c.indexOf(cookieName) == 0) {
                 return c.substring(cookieName.length, c.length);
             }
         }
-
         return '';
     }
 
@@ -32,7 +32,7 @@ export class Cookies {
         this.setCookie(name, '', -1);
     }
 
-    private setCookie(name: string, value: string, expireDays: number = this.COOKIE_EXPIRE_DAYS, path: string = '') {
+    private setCookie(name: string, value: string, expireDays: number = this.COOKIE_EXPIRE_DAYS, path: string = '/') {
         let d: Date = new Date();
         d.setTime(d.getTime() + expireDays * 24 * 60 * 60 * 1000);
         let expires: string = `expires=${d.toUTCString()}`;
@@ -59,7 +59,7 @@ export class Cookies {
         }), this.COOKIE_EXPIRE_DAYS);
     }
 
-    public getJobstartCreator() {
+    public getCurrentUser() {
         let currentCookie: string = this.getCookie(this.JOBSTART_CREATOR);
         if (currentCookie.length !== 0) {
             return JSON.parse(currentCookie);
@@ -67,7 +67,7 @@ export class Cookies {
         return null;
     }
 
-    public setJobstartCreator(employee: Creator) {
+    public cookieEmployee(employee:Employee){
         this.setCookie(this.JOBSTART_CREATOR, JSON.stringify(employee), this.COOKIE_EXPIRE_DAYS);
     }
 }
